@@ -32,10 +32,22 @@ class UserController extends Controller
         $data = [];
         $data['name'] = $request->name;
         $data['email'] = $request->email;
-        $data['password'] = Hash::make($request['password']);;
-        $user = $this->repo->create($data);
+        $data['password'] = Hash::make($request['password']);
 
-        return Api::res($user, 'User created successfully', 201);
+        if ($request->has('id')) {
+            $user = $this->repo->find($request->id);
+            if (!$user) {
+                return Api::resError('User not found', null, 404);
+            }
+            $user->update($data);
+        } else {
+            $existingUser = $this->repo->findByEmail($data['email']);
+            if ($existingUser) {
+                return Api::resError('Email already exists', null, 400);
+            }
+        }
+
+        return Api::res($user, 'User saved successfully', $request->has('id') ? 200 : 201);
     }
 
     public function show($id)

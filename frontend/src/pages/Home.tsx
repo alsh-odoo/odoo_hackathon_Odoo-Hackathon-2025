@@ -97,57 +97,7 @@ const Home = () => {
         </Select>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <Card>
-          <CardContent className="p-4 flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <MessageSquare className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900">{questions.length}</div>
-              <div className="text-sm text-gray-600">Questions</div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center space-x-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <ThumbsUp className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900">
-                {questions.reduce((acc, q) => acc + q.votes, 0)}
-              </div>
-              <div className="text-sm text-gray-600">Total Votes</div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center space-x-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900">
-                {questions.reduce((acc, q) => acc + q.answers, 0)}
-              </div>
-              <div className="text-sm text-gray-600">Answers</div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center space-x-3">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <Calendar className="w-5 h-5 text-orange-600" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900">Today</div>
-              <div className="text-sm text-gray-600">Active</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+   
 
       {/* Questions List */}
       <div className="space-y-4">

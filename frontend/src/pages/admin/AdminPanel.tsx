@@ -25,9 +25,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+
 
 const AdminPanel = () => {
+  const { toast } = useToast();
   const [announcement, setAnnouncement] = useState('');
 
   // Mock data

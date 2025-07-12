@@ -1,15 +1,17 @@
 
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '../../contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+import { useUserLogin } from '@/states/auth/auth.services';
+import { useAuthStore } from '@/stores/authStore';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -20,31 +22,20 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const loginSuccess = () => {
+    setIsLoading(false);
+    navigate('/');
+  }
+  const { mutate: userLogin } = useUserLogin(loginSuccess);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
-    try {
-      await login(data.email, data.password);
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
-      });
-      navigate('/');
-    } catch (error) {
-      toast({
-        title: "Login failed",
-        description: "Invalid email or password.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    userLogin(data)
   };
 
   return (

@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
   (res: AxiosResponse) => {
     if (!res.data) throw new Error('Error in response');
     const { statusCode, error } = res.data;
-    const hasSuccess = (statusCode === 200 || statusCode === 201) && error === false;
+    const hasSuccess = (statusCode === 200 || statusCode === 201) ;
     if (hasSuccess) return res?.data;
   },
   (error: AxiosError<Result>) => {

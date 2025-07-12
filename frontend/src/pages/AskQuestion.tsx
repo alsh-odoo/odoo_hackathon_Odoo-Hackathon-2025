@@ -11,7 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus } from 'lucide-react';
 import { RichTextEditor } from '../components/editor/RichTextEditor';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+import { useCreateQuestion } from '@/states/questions/questions.services';
+import { useAuthStore } from '@/stores/authStore';
+
 
 const questionSchema = z.object({
   title: z.string().min(10, 'Title must be at least 10 characters').max(200, 'Title must be less than 200 characters'),
@@ -22,10 +25,20 @@ const questionSchema = z.object({
 type QuestionFormData = z.infer<typeof questionSchema>;
 
 const AskQuestion = () => {
+  const { user } = useAuthStore()
   const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  const { toast } = useToast();
+  const handleCreateQuestionSuccess = () => {
+    toast({
+      title: 'Question posted successfully',
+      description: 'Your question has been posted. You can view it in your profile.',
+    });
+    navigate('/');
+  }
+  const { mutate: createQuestion } = useCreateQuestion(handleCreateQuestionSuccess)
 
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<QuestionFormData>({
     resolver: zodResolver(questionSchema),
@@ -64,27 +77,13 @@ const AskQuestion = () => {
       addTag(tagInput);
     }
   };
+  console.log("values", user);
 
   const onSubmit = async (data: QuestionFormData) => {
-    try {
-      console.log('Submitting question:', { ...data, content });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Question Posted!",
-        description: "Your question has been posted successfully.",
-      });
-      
-      navigate('/');
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to post question. Please try again.",
-        variant: "destructive",
-      });
-    }
+    createQuestion({
+      ...data,
+      user_id: user?.id,
+    })
   };
 
   return (

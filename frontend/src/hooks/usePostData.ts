@@ -1,5 +1,6 @@
-import instance from '@/config/instance';
+
 import { useToast } from '@/components/ui/use-toast';
+import instance from '@/config/instance/instance';
 import {
   useMutation,
   UseMutationOptions,

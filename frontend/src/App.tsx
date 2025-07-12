@@ -37,11 +37,11 @@ const App = () => (
                   </ProtectedRoute>
                 } />
                 <Route path="/question/:id" element={<QuestionDetail />} />
-                <Route path="/admin" element={
+                {/* <Route path="/admin" element={
                   <ProtectedRoute requireAdmin>
                     <AdminPanel />
                   </ProtectedRoute>
-                } />
+                } /> */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

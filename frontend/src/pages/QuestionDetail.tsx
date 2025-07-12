@@ -8,13 +8,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { RichTextEditor } from '../components/editor/RichTextEditor';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+
 
 const QuestionDetail = () => {
   const { id } = useParams();
   const { user, isAuthenticated } = useAuth();
   const [answerContent, setAnswerContent] = useState('');
   const [userVotes, setUserVotes] = useState<{ [key: string]: 'up' | 'down' | null }>({});
+  const { toast } = useToast();
 
   // Mock data - in real app this would come from API
   const question = {

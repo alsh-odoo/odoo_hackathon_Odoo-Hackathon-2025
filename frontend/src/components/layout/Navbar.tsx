@@ -12,11 +12,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '../../contexts/AuthContext';
 import { NotificationDropdown } from '../notifications/NotificationDropdown';
+import { useAuthStore } from '@/stores/authStore';
 
 const Navbar = () => {
-  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const isAdmin = user?.role === 'admin';
   const navigate = useNavigate();
-
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -68,12 +69,9 @@ const Navbar = () => {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center space-x-2">
-                      <img
-                        src={user?.avatar}
-                        alt={user?.name}
-                        className="w-8 h-8 rounded-full"
-                      />
-                      <span className="hidden md:block">{user?.name}</span>
+                      <User className="w-4 h-4"/>
+                      <span className="hidden md:inline">{user?.name}</span>
+                      {isAdmin && <Badge className="bg-purple-600 text-white">Admin</Badge>}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">

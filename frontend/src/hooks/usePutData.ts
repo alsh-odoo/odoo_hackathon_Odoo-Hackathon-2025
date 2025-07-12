@@ -1,4 +1,5 @@
-import instance from '@/config/instance';
+
+import instance from '@/config/instance/instance';
 import {
   UseMutationOptions,
   useMutation,

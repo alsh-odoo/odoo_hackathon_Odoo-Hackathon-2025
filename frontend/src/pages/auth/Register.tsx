@@ -9,7 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '../../contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+import { useUserRegister } from '@/states/auth/auth.services';
+
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -24,32 +26,22 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 const Register = () => {
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false);
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
+  const handleRegisterSuccess = () => {
+    navigate('/login');
+  };
+  const { mutate: userRegister } = useUserRegister(handleRegisterSuccess)
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    setIsLoading(true);
-    try {
-      await registerUser(data.name, data.email, data.password);
-      toast({
-        title: "Account created!",
-        description: "Welcome to StackIt! You can now start asking questions.",
-      });
-      navigate('/');
-    } catch (error) {
-      toast({
-        title: "Registration failed",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    const { confirmPassword, ...payload } = data;
+    userRegister(payload)
   };
 
   return (

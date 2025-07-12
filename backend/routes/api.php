@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AnswerController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -25,6 +26,14 @@ Route::prefix('v1')->group(function () {
     Route::post('question/save', [QuestionController::class, 'store']);
     Route::get('question/{id}', [QuestionController::class, 'show']);
     Route::delete('question/{ids}', [QuestionController::class, 'delete']);
+
+    // Route::get('answers', [QuestionController::class, 'index']);
+    Route::post('answers/save', [QuestionController::class, 'store']);
+    Route::get('answers/{id}', [QuestionController::class, 'show']);
+    Route::delete('answers/{ids}', [QuestionController::class, 'delete']);
+    Route::post('answers/{id}/upvote', [AnswerController::class, 'upvote']);
+    Route::post('answers/{id}/downvote', [AnswerController::class, 'downvote']);
+
 
 });
 

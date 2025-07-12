@@ -22,7 +22,7 @@ class QuestionController extends Controller
         $data = [];
 
         [$elements, $total] = $this->repo->listing();
-        $data['elements'] = $elements;
+        $data['data'] = $elements;
         $data['total'] = $total;
 
         return Api::res($data, 'Questions retrieved successfully', 200);

@@ -1,18 +1,18 @@
 <?php
 
 namespace App\Repositories;
-use App\Models\Question;
+use App\Models\Answer;
 
-class QuestionRepository
+class AnswerRepository
 {
     public function tableName()
     {
-        return Question::TABLE_NAME;
+        return Answer::TABLE_NAME;
     }
 
     public function modelQuery()
     {
-        return Question::query();
+        return Answer::query();
     }
 
     public function query()
@@ -21,11 +21,11 @@ class QuestionRepository
             $this->tableName() . '.*',
         ];
 
-        $model = $this->modelQuery()->select($selections)->with('tags', 'answers', 'answers.user', 'user');
+        $model = $this->modelQuery()->select($selections)->with('user', 'question');
         if (request('search')) {
             $model->where(function ($query) {
                 $search = request('search');
-                $query->orWhere($this->tableName() . '.' . Question::TITLE, 'like', "%{$search}%");
+                $query->orWhere($this->tableName() . '.' . Answer::ANSWER, 'like', "%{$search}%");
             });
         }
         return $model;
@@ -36,14 +36,14 @@ class QuestionRepository
         return [$this->query()->get(), $this->query()->count()];
     }
 
-    public function create(array $data): Question
+    public function create(array $data): Answer
     {
         return $this->modelQuery()->create($data);
     }
 
-    public function find($id): ?Question
+    public function find($id): ?Answer
     {
-        return $this->modelQuery()->with('tags')->find($id);
+        return $this->modelQuery()->with('question')->find($id);
     }
 
 

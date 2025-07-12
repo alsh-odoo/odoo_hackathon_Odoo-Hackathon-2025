@@ -43,7 +43,7 @@ class QuestionRepository
 
     public function find($id): ?Question
     {
-        return $this->modelQuery()->with('tags')->find($id);
+        return $this->modelQuery()->with('tags', 'answers', 'answers.user', 'user')->find($id);
     }
 
 

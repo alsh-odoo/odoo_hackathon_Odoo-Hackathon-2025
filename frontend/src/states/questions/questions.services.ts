@@ -17,3 +17,7 @@ export const useCreateQuestion = (onSuccess) => {
     refetchQueries: [API.quesions.get],
   });
 };
+
+export const useGetQuestionByID = (id: string) => {
+  return useFetchData({ url: `${API.quesions.get}/${id}`,enabled:!!id });
+};

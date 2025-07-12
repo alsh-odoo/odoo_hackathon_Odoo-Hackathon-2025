@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import {
+  useParams,
+  Link,
+  useSearchParams,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -15,13 +21,22 @@ import { Separator } from "@/components/ui/separator";
 import { RichTextEditor } from "../components/editor/RichTextEditor";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
-import { usePostAnswer } from "@/states/answer/answer.services";
+import {
+  useIncrementCounterInAnswerUpvote,
+  usePostAnswer,
+} from "@/states/answer/answer.services";
 import { useAuthStore } from "@/stores/authStore";
+import { useGetQuestionByID } from "@/states/questions/questions.services";
 
 const QuestionDetail = () => {
   const { id } = useParams();
-  const {  isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [answerContent, setAnswerContent] = useState("");
+  const { user } = useAuthStore();
+  const { id: question_id } = useParams();
+  const { data: QuestionDetail, refetch } = useGetQuestionByID(question_id);
+  console.log("QuestionDetail", QuestionDetail);
+  const navigate = useNavigate();
   const [userVotes, setUserVotes] = useState<{
     [key: string]: "up" | "down" | null;
   }>({});
@@ -49,7 +64,7 @@ const QuestionDetail = () => {
     author: "john_doe",
     authorAvatar:
       "https://ui-avatars.com/api/?name=John+Doe&background=6366f1&color=fff",
-    votes: 15,
+    votes: 0,
     views: 234,
     tags: ["React", "JWT", "Authentication"],
     createdAt: "2 hours ago",
@@ -107,6 +122,7 @@ const useAuthStore = create(persist(
       isAccepted: false,
     },
   ];
+  const [answerUpvotesCount, setAnswerUpvoteCount] = useState(0);
 
   const handleVote = (
     type: "up" | "down",
@@ -136,6 +152,24 @@ const useAuthStore = create(persist(
       description: `Your ${type}vote has been recorded.`,
     });
   };
+  // const {id}=useParams()
+  const [answerId, setAnswerId] = useState(null);
+  const { mutate: incrementUpvotes } = useIncrementCounterInAnswerUpvote(
+    Number(answerId)
+  );
+
+  const handleUpwords = (id: number) => {
+    setAnswerId(id);
+    setAnswerUpvoteCount((prev) => prev + 1);
+    incrementUpvotes(
+      {},
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
+  };
 
   const handleAcceptAnswer = (answerId: number) => {
     if (!isAuthenticated) {
@@ -152,8 +186,6 @@ const useAuthStore = create(persist(
       description: "This answer has been marked as the accepted solution.",
     });
   };
-
-  const {user}=useAuthStore()
 
   const handleSubmitAnswer = () => {
     if (!isAuthenticated) {
@@ -174,11 +206,18 @@ const useAuthStore = create(persist(
       return;
     }
 
-    postAnswer({
-      answer: answerContent,
-      user_id:user?.user?.id,
-      question_id:10
-    });
+    postAnswer(
+      {
+        answer: answerContent,
+        user_id: user?.user?.id,
+        question_id: question_id,
+      },
+      {
+        onSuccess: () => {
+          navigate("/");
+        },
+      }
+    );
 
     // console.log('Submitting answer:', answerContent);
     // setAnswerContent('');
@@ -200,14 +239,16 @@ const useAuthStore = create(persist(
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleVote("up", "question-1", "question")}
+                onClick={() => handleUpwords(4)}
                 className={
                   userVotes["question-1"] === "up" ? "text-green-600" : ""
                 }
               >
                 <ThumbsUp className="w-6 h-6" />
               </Button>
-              <span className="text-xl font-bold">{question.votes}</span>
+              <span className="text-xl font-bold">
+                {QuestionDetail?.answer?.upvotes}
+              </span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -226,19 +267,21 @@ const useAuthStore = create(persist(
             {/* Content */}
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                {question.title}
+                {QuestionDetail?.title}
               </h1>
 
               <div
                 className="prose max-w-none mb-6"
-                dangerouslySetInnerHTML={{ __html: question.content }}
+                dangerouslySetInnerHTML={{
+                  __html: QuestionDetail?.description,
+                }}
               />
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-4">
-                {question.tags.map((tag) => (
+                {QuestionDetail?.tags?.map((tag) => (
                   <Badge key={tag} variant="secondary">
-                    {tag}
+                    {tag?.name}
                   </Badge>
                 ))}
               </div>
@@ -250,21 +293,8 @@ const useAuthStore = create(persist(
                     <Share2 className="w-4 h-4 mr-2" />
                     Share
                   </Button>
-                  <span className="text-sm text-gray-500">
-                    {question.views} views
-                  </span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <img
-                    src={question.authorAvatar}
-                    alt={question.author}
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <div className="text-sm">
-                    <div className="font-medium">{question.author}</div>
-                    <div className="text-gray-500">{question.createdAt}</div>
-                  </div>
-                </div>
+               
               </div>
             </div>
           </div>
@@ -273,12 +303,14 @@ const useAuthStore = create(persist(
 
       {/* Answers */}
       <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">{answers.length} Answers</h2>
+        <h2 className="text-xl font-bold mb-4">
+          {QuestionDetail?.answers?.length} Answers
+        </h2>
 
         <div className="space-y-6">
-          {answers.map((answer) => (
+          {QuestionDetail?.answers?.map((answer) => (
             <Card
-              key={answer.id}
+              key={answer?.id}
               className={
                 answer.isAccepted ? "border-green-200 bg-green-50" : ""
               }
@@ -290,9 +322,7 @@ const useAuthStore = create(persist(
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        handleVote("up", `answer-${answer.id}`, "answer")
-                      }
+                      onClick={() => handleUpwords(answer?.id)}
                       className={
                         userVotes[`answer-${answer.id}`] === "up"
                           ? "text-green-600"
@@ -301,7 +331,7 @@ const useAuthStore = create(persist(
                     >
                       <ThumbsUp className="w-6 h-6" />
                     </Button>
-                    <span className="text-xl font-bold">{answer.votes}</span>
+                    <span className="text-xl font-bold">{answer?.upvotes}</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -341,7 +371,7 @@ const useAuthStore = create(persist(
 
                     <div
                       className="prose max-w-none mb-4"
-                      dangerouslySetInnerHTML={{ __html: answer.content }}
+                      dangerouslySetInnerHTML={{ __html: answer?.answer }}
                     />
 
                     <div className="flex items-center justify-between">

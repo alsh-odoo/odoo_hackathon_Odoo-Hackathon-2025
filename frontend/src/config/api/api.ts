@@ -8,7 +8,8 @@ const API = {
     post:'question/save',
   },
   answers:{
-    postAnswer:'answers/save'
+    postAnswer:'answers/save',
+    upvotes:'answers'
   }
 };
 

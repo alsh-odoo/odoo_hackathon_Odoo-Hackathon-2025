@@ -1,17 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  Search,
-  Filter,
-  TrendingUp,
-  MessageSquare,
-  ThumbsUp,
-  Calendar,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -20,6 +10,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetAllQuestions } from "@/states/questions/questions.services";
+import {
+  Search
+} from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -179,14 +174,14 @@ const Home = () => {
                     <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
                       {question?.title}
                     </h3>
-                    <p
-                      className="text-gray-600 text-sm mb-3 line-clamp-2"
+                    <div
+                      className="text-gray-600 text-sm mb-3 "
                       dangerouslySetInnerHTML={{
-                        __html: question?.description,
+                        __html: question?.description.slice(0,500),
                       }}
                     >
                       {/* {question?.description} */}
-                    </p>
+                    </div>
                   </Link>
 
                   {/* Tags */}

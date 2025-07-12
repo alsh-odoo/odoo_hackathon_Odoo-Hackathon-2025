@@ -26,6 +26,7 @@ class AnswerRequest extends FormRequest
     {
         return [
             'question_id' => 'required|exists:questions,id',
+            'user_id' => 'required|exists:users,id',
             'answer' => 'required|string',
         ];
     }
@@ -40,6 +41,8 @@ class AnswerRequest extends FormRequest
         return [
             'question_id.required' => 'The question ID is required.',
             'question_id.exists' => 'The selected question does not exist.',
+            'user_id.required' => 'The user ID is required.',
+            'user_id.exists' => 'The user does not exist.',
             'answer.required' => 'The answer is required.',
             'answer.string' => 'The answer must be a string.',
         ];

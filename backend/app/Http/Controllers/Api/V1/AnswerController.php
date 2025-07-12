@@ -6,14 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AnswerRequest;
 use App\Lib\Api;
 use App\Repositories\AnswerRepository;
+use App\Repositories\QuestionRepository;
 
 class AnswerController extends Controller
 {
     protected $repo;
+    protected $questionRepository;
 
-    public function __construct(AnswerRepository $repo)
+    public function __construct(AnswerRepository $repo, QuestionRepository $questionRepository)
     {
         $this->repo = $repo;
+        $this->questionRepository = $questionRepository;
     }
     // public function index()
     // {
@@ -30,14 +33,14 @@ class AnswerController extends Controller
     {
         $data = [
             'question_id' => $request->question_id,
-            'user_id' => auth()->user()->id,
+            'user_id' => $request->user_id ?? auth()->user()->id,
             'answer' => $request->answer,
             'upvotes' => $request->upvotes ?? 0,
             'downvotes' => $request->downvotes ?? 0,
             'accepted_status' => $request->accepted_status ?? 0,
         ];
 
-        $question = $this->repo->find($request->question_id);
+        $question = $this->questionRepository->find($request->question_id);
         if (!$question) {
             return Api::resError('Question not found', null, 404);
         }

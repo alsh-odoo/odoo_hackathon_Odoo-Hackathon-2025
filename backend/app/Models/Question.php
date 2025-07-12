@@ -19,4 +19,10 @@ class Question extends Model
         self::STATUS,
     ];
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'tags');
+    }
+
+
 }

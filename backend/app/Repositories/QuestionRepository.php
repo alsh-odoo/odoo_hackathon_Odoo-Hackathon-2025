@@ -21,7 +21,7 @@ class QuestionRepository
             $this->tableName() . '.*',
         ];
 
-        $model = $this->modelQuery()->select($selections);
+        $model = $this->modelQuery()->select($selections)->with('tags');
         if (request('search')) {
             $model->where(function ($query) {
                 $search = request('search');
@@ -43,7 +43,7 @@ class QuestionRepository
 
     public function find($id): ?Question
     {
-        return $this->modelQuery()->find($id);
+        return $this->modelQuery()->with('tags')->find($id);
     }
 
 

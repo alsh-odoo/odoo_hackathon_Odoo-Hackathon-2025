@@ -28,6 +28,7 @@ class QuestionRequest extends FormRequest
             'user_id' => 'required|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'tags' => 'array|nullable',
         ];
     }
 
@@ -46,6 +47,8 @@ class QuestionRequest extends FormRequest
             'title.max' => 'The title may not be greater than 255 characters.',
             'description.required' => 'The description is required.',
             'description.string' => 'The description must be a string.',
+            'tags.array' => 'The tags must be an array.',
+
         ];
     }
 

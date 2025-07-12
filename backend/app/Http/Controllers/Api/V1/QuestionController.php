@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QuestionRequest;
 use App\Lib\Api;
+use App\Models\Tag;
 use App\Repositories\QuestionRepository;
 use Illuminate\Http\Request;
 
@@ -28,25 +29,46 @@ class QuestionController extends Controller
 
     }
 
-    Public function store(QuestionRequest $request)
+    public function store(QuestionRequest $request)
     {
-        $data = [];
-        $data['user_id'] = $request->user_id;
-        $data['title'] = $request->title;
-        $data['description'] = $request->description;
-        $question = $this->repo->create($data);
+        $data = [
+            'user_id' => $request->user_id,
+            'title' => $request->title,
+            'description' => $request->description,
+        ];
 
-        return Api::res($question, 'Question created successfully', 201);
+        if ($request->has('id')) {
+            $question = $this->repo->find($request->id);
+            if (!$question) {
+                return Api::resError('Question not found', null, 404);
+            }
+
+            $question->update($data);
+            $question->tags()->delete();
+        } else {
+            $question = $this->repo->create($data);
+        }
+
+        if ($request->filled('tags') && is_array($request->tags)) {
+            foreach ($request->tags as $tagName) {
+                Tag::create([
+                    'name' => $tagName,
+                    'question_id' => $question->id,
+                ]);
+            }
+        }
+
+        return Api::res($question->load('tags'), 'Question saved successfully', $request->has('id') ? 200 : 201);
     }
+
 
     public function show($id)
     {
         $question = $this->repo->find($id);
         if (!$question) {
-            return Api::resError('Question not found',null,  404);
+            return Api::resError('Question not found', null, 404);
         }
         return Api::res($question, 'Question retrieved successfully', 200);
-
     }
 
     public function delete($ids)
@@ -60,6 +82,8 @@ class QuestionController extends Controller
             if ($question->user_id != auth()->id()) {
                 return Api::resError('You do not have permission to delete this question', null, 403);
             }
+
+            Tag::where('question_id', $question->id)->delete();
             $question->delete();
 
         }

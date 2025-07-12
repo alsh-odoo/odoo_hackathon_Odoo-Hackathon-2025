@@ -6,8 +6,7 @@ use App\Lib\Api;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
-
-class AnswerRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +24,8 @@ class AnswerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'question_id' => 'required|exists:questions,id',
-            'user_id' => 'required|exists:users,id',
-            'answer' => 'required|string',
+            'email' => 'required|email|max:255',
+            'password' => 'required|string|min:8',
         ];
     }
 
@@ -39,14 +37,13 @@ class AnswerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'question_id.required' => 'The question ID is required.',
-            'question_id.exists' => 'The selected question does not exist.',
-            'user_id.required' => 'The user ID is required.',
-            'user_id.exists' => 'The user does not exist.',
-            'answer.required' => 'The answer is required.',
-            'answer.string' => 'The answer must be a string.',
+            'email.required' => 'The email field is required.',
+            'email.email' => 'The email must be a valid email address.',
+            'password.required' => 'The password field is required.',
+            'password.min' => 'The password must be at least 8 characters.',
         ];
     }
+
 
     protected function failedValidation(Validator $validator)
     {
@@ -55,5 +52,3 @@ class AnswerRequest extends FormRequest
         );
     }
 }
-
-

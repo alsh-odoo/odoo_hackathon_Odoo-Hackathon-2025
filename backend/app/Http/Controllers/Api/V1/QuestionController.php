@@ -50,10 +50,13 @@ class QuestionController extends Controller
         }
 
         if ($request->filled('tags') && is_array($request->tags)) {
+            info("question tags: " . json_encode($request->tags));
+            info("question ");
+            info($question->id);
             foreach ($request->tags as $tagName) {
                 Tag::create([
-                    'name' => $tagName,
                     'question_id' => $question->id,
+                    'name' => $tagName,
                 ]);
             }
         }

@@ -33,7 +33,7 @@ class AuthService
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return [
-                'error' => 'The provided credentials are incorrect.'
+                'data' => 'The provided credentials are incorrect.'
             ];
         }
 

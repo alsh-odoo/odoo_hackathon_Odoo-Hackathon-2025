@@ -29,7 +29,7 @@ class Api
             'status' => false,
             'message' => $message,
         ];
-        $response['error'] = $data;
+        $response['data'] = $data;
         return response()->json($response, $statusCode);
     }
 

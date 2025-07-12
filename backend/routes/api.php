@@ -28,9 +28,9 @@ Route::prefix('v1')->group(function () {
     Route::delete('question/{ids}', [QuestionController::class, 'delete']);
 
     // Route::get('answers', [QuestionController::class, 'index']);
-    Route::post('answers/save', [QuestionController::class, 'store']);
-    Route::get('answers/{id}', [QuestionController::class, 'show']);
-    Route::delete('answers/{ids}', [QuestionController::class, 'delete']);
+    Route::post('answers/save', [AnswerController::class, 'store']);
+    Route::get('answers/{id}', [AnswerController::class, 'show']);
+    Route::delete('answers/{ids}', [AnswerController::class, 'delete']);
     Route::post('answers/{id}/upvote', [AnswerController::class, 'upvote']);
     Route::post('answers/{id}/downvote', [AnswerController::class, 'downvote']);
 

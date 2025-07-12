@@ -4,12 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
-use App\Http\Resources\UserResource;
 use App\Lib\Api;
-use App\Repositories\UserRepository;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
-use Validator;
 
 class AuthController extends Controller
 {

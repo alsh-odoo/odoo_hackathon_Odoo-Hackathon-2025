@@ -1,27 +1,21 @@
 <?php
 
 namespace App\Repositories;
-use App\Models\User;
+use App\Models\Question;
 
-class UserRepository
+class QuestionRepository
 {
-    protected $model;
-      public function __construct(User $model)
-    {
-        $this->model = $model;
-    }
-
     public function tableName()
     {
-        return User::TABLE_NAME;
+        return Question::TABLE_NAME;
     }
 
     public function modelQuery()
     {
-        return User::query();
+        return Question::query();
     }
 
-    public function query()
+    public function query($paginate = false)
     {
         $selections = [
             $this->tableName() . '.*',
@@ -31,7 +25,7 @@ class UserRepository
         if (request('search')) {
             $model->where(function ($query) {
                 $search = request('search');
-                $query->orWhere($this->tableName() . '.' . User::NAME, 'like', "%{$search}%");
+                $query->orWhere($this->tableName() . '.' . Question::TITLE, 'like', "%{$search}%");
             });
         }
         return $model;
@@ -39,21 +33,18 @@ class UserRepository
 
     public function listing()
     {
-        return [$this->query()->get(), $this->query()->count()];
+        return [$this->query(true)->get(), $this->query()->count()];
     }
 
-    public function findByEmail($email)
-    {
-        return $this->model->where(User::EMAIL, $email)->first();
-    }
-
-    public function create(array $data): User
+    public function create(array $data): Question
     {
         return $this->modelQuery()->create($data);
     }
 
-    public function find($id): ?User
+    public function find($id): ?Question
     {
         return $this->modelQuery()->find($id);
     }
+
+
 }

@@ -17,14 +17,14 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('user', [UserController::class, 'index']);
+    Route::put('user/save', [UserController::class, 'store']);
     Route::get('user/{id}', [UserController::class, 'show']);
-    Route::put('user/{id}', [UserController::class, 'update']);
     Route::delete('user/{id}', [UserController::class, 'delete']);
 
-        Route::get('question', [QuestionController::class, 'index']);
-        Route::post('question/save', [QuestionController::class, 'store']);
-        Route::get('question/{id}', [QuestionController::class, 'show']);
-        Route::delete('question/{ids}', [QuestionController::class, 'delete']);
+    Route::get('question', [QuestionController::class, 'index']);
+    Route::post('question/save', [QuestionController::class, 'store']);
+    Route::get('question/{id}', [QuestionController::class, 'show']);
+    Route::delete('question/{ids}', [QuestionController::class, 'delete']);
 
 });
 

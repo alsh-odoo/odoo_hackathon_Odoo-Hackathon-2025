@@ -15,7 +15,7 @@ class QuestionRepository
         return Question::query();
     }
 
-    public function query($paginate = false)
+    public function query()
     {
         $selections = [
             $this->tableName() . '.*',
@@ -33,7 +33,7 @@ class QuestionRepository
 
     public function listing()
     {
-        return [$this->query(true)->get(), $this->query()->count()];
+        return [$this->query()->get(), $this->query()->count()];
     }
 
     public function create(array $data): Question

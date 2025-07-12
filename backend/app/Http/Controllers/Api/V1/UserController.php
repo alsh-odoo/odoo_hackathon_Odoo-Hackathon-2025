@@ -21,7 +21,7 @@ class UserController extends Controller
     {
         $data = [];
         [$element, $count] = $this->repo->listing();
-        $data['elements'] = $element;
+        $data['users'] = $element;
         $data['total'] = $count;
 
         return Api::res($data, 'User fetched successfully', 200);

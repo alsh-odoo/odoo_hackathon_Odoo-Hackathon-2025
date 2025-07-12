@@ -82,7 +82,8 @@ const AskQuestion = () => {
   const onSubmit = async (data: QuestionFormData) => {
     createQuestion({
       ...data,
-      user_id: user?.id,
+      description:data.content,
+      user_id: user?.user?.id,
     })
   };
 

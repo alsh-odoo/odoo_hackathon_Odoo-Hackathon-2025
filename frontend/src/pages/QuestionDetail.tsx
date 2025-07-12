@@ -1,27 +1,37 @@
-
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ThumbsUp, ThumbsDown, MessageSquare, Share2, BookmarkPlus, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { RichTextEditor } from '../components/editor/RichTextEditor';
-import { useAuth } from '../contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-
+import { useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import {
+  ThumbsUp,
+  ThumbsDown,
+  MessageSquare,
+  Share2,
+  BookmarkPlus,
+  Check,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { RichTextEditor } from "../components/editor/RichTextEditor";
+import { useAuth } from "../contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
+import { usePostAnswer } from "@/states/answer/answer.services";
+import { useAuthStore } from "@/stores/authStore";
 
 const QuestionDetail = () => {
   const { id } = useParams();
-  const { user, isAuthenticated } = useAuth();
-  const [answerContent, setAnswerContent] = useState('');
-  const [userVotes, setUserVotes] = useState<{ [key: string]: 'up' | 'down' | null }>({});
+  const {  isAuthenticated } = useAuth();
+  const [answerContent, setAnswerContent] = useState("");
+  const [userVotes, setUserVotes] = useState<{
+    [key: string]: "up" | "down" | null;
+  }>({});
   const { toast } = useToast();
+  const { mutate: postAnswer } = usePostAnswer();
 
   // Mock data - in real app this would come from API
   const question = {
     id: 1,
-    title: 'How to implement authentication in React with JWT?',
+    title: "How to implement authentication in React with JWT?",
     content: `
       <p>I am trying to implement JWT authentication in my React application but facing some issues with token storage and validation.</p>
       <p>Here's what I've tried so far:</p>
@@ -36,13 +46,14 @@ const QuestionDetail = () => {
 };</code></pre>
       <p>The issue is that the token gets cleared when I refresh the page. How can I properly manage JWT tokens in React?</p>
     `,
-    author: 'john_doe',
-    authorAvatar: 'https://ui-avatars.com/api/?name=John+Doe&background=6366f1&color=fff',
+    author: "john_doe",
+    authorAvatar:
+      "https://ui-avatars.com/api/?name=John+Doe&background=6366f1&color=fff",
     votes: 15,
     views: 234,
-    tags: ['React', 'JWT', 'Authentication'],
-    createdAt: '2 hours ago',
-    isAnswered: true
+    tags: ["React", "JWT", "Authentication"],
+    createdAt: "2 hours ago",
+    isAnswered: true,
   };
 
   const answers = [
@@ -65,11 +76,12 @@ app.post('/login', (req, res) => {
         <h3>2. Implement token refresh mechanism</h3>
         <p>Use refresh tokens to maintain authentication state...</p>
       `,
-      author: 'sarah_wilson',
-      authorAvatar: 'https://ui-avatars.com/api/?name=Sarah+Wilson&background=ec4899&color=fff',
+      author: "sarah_wilson",
+      authorAvatar:
+        "https://ui-avatars.com/api/?name=Sarah+Wilson&background=ec4899&color=fff",
       votes: 23,
-      createdAt: '1 hour ago',
-      isAccepted: true
+      createdAt: "1 hour ago",
+      isAccepted: true,
     },
     {
       id: 2,
@@ -87,15 +99,20 @@ const useAuthStore = create(persist(
   { name: 'auth-storage' }
 ));</code></pre>
       `,
-      author: 'mike_chen',
-      authorAvatar: 'https://ui-avatars.com/api/?name=Mike+Chen&background=10b981&color=fff',
+      author: "mike_chen",
+      authorAvatar:
+        "https://ui-avatars.com/api/?name=Mike+Chen&background=10b981&color=fff",
       votes: 8,
-      createdAt: '30 minutes ago',
-      isAccepted: false
-    }
+      createdAt: "30 minutes ago",
+      isAccepted: false,
+    },
   ];
 
-  const handleVote = (type: 'up' | 'down', itemId: string, itemType: 'question' | 'answer') => {
+  const handleVote = (
+    type: "up" | "down",
+    itemId: string,
+    itemType: "question" | "answer"
+  ) => {
     if (!isAuthenticated) {
       toast({
         title: "Login required",
@@ -106,14 +123,14 @@ const useAuthStore = create(persist(
     }
 
     const currentVote = userVotes[itemId];
-    let newVote: 'up' | 'down' | null = type;
-    
+    let newVote: "up" | "down" | null = type;
+
     if (currentVote === type) {
       newVote = null; // Remove vote if clicking same button
     }
 
     setUserVotes({ ...userVotes, [itemId]: newVote });
-    
+
     toast({
       title: "Vote recorded",
       description: `Your ${type}vote has been recorded.`,
@@ -136,6 +153,8 @@ const useAuthStore = create(persist(
     });
   };
 
+  const {user}=useAuthStore()
+
   const handleSubmitAnswer = () => {
     if (!isAuthenticated) {
       toast({
@@ -155,9 +174,15 @@ const useAuthStore = create(persist(
       return;
     }
 
-    console.log('Submitting answer:', answerContent);
-    setAnswerContent('');
-    
+    postAnswer({
+      answer: answerContent,
+      user_id:user?.user?.id,
+      question_id:10
+    });
+
+    // console.log('Submitting answer:', answerContent);
+    // setAnswerContent('');
+
     toast({
       title: "Answer posted",
       description: "Your answer has been posted successfully.",
@@ -175,8 +200,10 @@ const useAuthStore = create(persist(
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleVote('up', 'question-1', 'question')}
-                className={userVotes['question-1'] === 'up' ? 'text-green-600' : ''}
+                onClick={() => handleVote("up", "question-1", "question")}
+                className={
+                  userVotes["question-1"] === "up" ? "text-green-600" : ""
+                }
               >
                 <ThumbsUp className="w-6 h-6" />
               </Button>
@@ -184,8 +211,10 @@ const useAuthStore = create(persist(
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleVote('down', 'question-1', 'question')}
-                className={userVotes['question-1'] === 'down' ? 'text-red-600' : ''}
+                onClick={() => handleVote("down", "question-1", "question")}
+                className={
+                  userVotes["question-1"] === "down" ? "text-red-600" : ""
+                }
               >
                 <ThumbsDown className="w-6 h-6" />
               </Button>
@@ -196,9 +225,11 @@ const useAuthStore = create(persist(
 
             {/* Content */}
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">{question.title}</h1>
-              
-              <div 
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                {question.title}
+              </h1>
+
+              <div
                 className="prose max-w-none mb-6"
                 dangerouslySetInnerHTML={{ __html: question.content }}
               />
@@ -219,7 +250,9 @@ const useAuthStore = create(persist(
                     <Share2 className="w-4 h-4 mr-2" />
                     Share
                   </Button>
-                  <span className="text-sm text-gray-500">{question.views} views</span>
+                  <span className="text-sm text-gray-500">
+                    {question.views} views
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <img
@@ -241,10 +274,15 @@ const useAuthStore = create(persist(
       {/* Answers */}
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">{answers.length} Answers</h2>
-        
+
         <div className="space-y-6">
           {answers.map((answer) => (
-            <Card key={answer.id} className={answer.isAccepted ? 'border-green-200 bg-green-50' : ''}>
+            <Card
+              key={answer.id}
+              className={
+                answer.isAccepted ? "border-green-200 bg-green-50" : ""
+              }
+            >
               <CardContent className="p-6">
                 <div className="flex gap-6">
                   {/* Voting */}
@@ -252,8 +290,14 @@ const useAuthStore = create(persist(
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleVote('up', `answer-${answer.id}`, 'answer')}
-                      className={userVotes[`answer-${answer.id}`] === 'up' ? 'text-green-600' : ''}
+                      onClick={() =>
+                        handleVote("up", `answer-${answer.id}`, "answer")
+                      }
+                      className={
+                        userVotes[`answer-${answer.id}`] === "up"
+                          ? "text-green-600"
+                          : ""
+                      }
                     >
                       <ThumbsUp className="w-6 h-6" />
                     </Button>
@@ -261,8 +305,14 @@ const useAuthStore = create(persist(
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleVote('down', `answer-${answer.id}`, 'answer')}
-                      className={userVotes[`answer-${answer.id}`] === 'down' ? 'text-red-600' : ''}
+                      onClick={() =>
+                        handleVote("down", `answer-${answer.id}`, "answer")
+                      }
+                      className={
+                        userVotes[`answer-${answer.id}`] === "down"
+                          ? "text-red-600"
+                          : ""
+                      }
                     >
                       <ThumbsDown className="w-6 h-6" />
                     </Button>
@@ -271,7 +321,7 @@ const useAuthStore = create(persist(
                         variant="ghost"
                         size="sm"
                         onClick={() => handleAcceptAnswer(answer.id)}
-                        className={answer.isAccepted ? 'text-green-600' : ''}
+                        className={answer.isAccepted ? "text-green-600" : ""}
                       >
                         <Check className="w-6 h-6" />
                       </Button>
@@ -283,11 +333,13 @@ const useAuthStore = create(persist(
                     {answer.isAccepted && (
                       <div className="flex items-center mb-2">
                         <Check className="w-4 h-4 text-green-600 mr-2" />
-                        <span className="text-sm font-medium text-green-600">Accepted Answer</span>
+                        <span className="text-sm font-medium text-green-600">
+                          Accepted Answer
+                        </span>
                       </div>
                     )}
-                    
-                    <div 
+
+                    <div
                       className="prose max-w-none mb-4"
                       dangerouslySetInnerHTML={{ __html: answer.content }}
                     />
@@ -305,7 +357,9 @@ const useAuthStore = create(persist(
                         />
                         <div className="text-sm">
                           <div className="font-medium">{answer.author}</div>
-                          <div className="text-gray-500">{answer.createdAt}</div>
+                          <div className="text-gray-500">
+                            {answer.createdAt}
+                          </div>
                         </div>
                       </div>
                     </div>

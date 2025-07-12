@@ -4,8 +4,11 @@ const API = {
     register: 'auth/register',
   },
   quesions:{
-    get:'questions',
+    get:'question',
     post:'question/save',
+  },
+  answers:{
+    postAnswer:'answers/save'
   }
 };
 
